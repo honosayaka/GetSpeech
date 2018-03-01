@@ -1,13 +1,22 @@
 package cn.hoNoSayaka.jt;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URI;
 
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -19,81 +28,162 @@ import javax.swing.JTextField;
 public class MainFrame extends JFrame {
 	Image verifyImg = null;
 	Proceed start = null;
+	String[] config = new String[2];
 	
-	public static void main(String[] args) {
-		MainFrame f = new MainFrame();
-		GetImgCookice g = new GetImgCookice("http://wxkq.niit.edu.cn/Login/verify");
-		Logger.init(g.getCookie());
-		f.lunchFrame(g.getImage());
-	}
+
 	public void lunchFrame(Image verifyImg) {
 		this.verifyImg = verifyImg;
-		JFrame jFrame = new JFrame("登陆界面");
+		this.setTitle("登陆界面");
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		jFrame.setBounds(((int)dimension.getWidth() - 500) / 2,
+		this.setBounds(((int)dimension.getWidth() - 500) / 2,
 				((int)dimension.getHeight() - 200) / 2,500, 200);
-		jFrame.setResizable(false);
-		jFrame.setLayout(null);
-		jFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setResizable(false);
+		this.setLayout(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		JLabel label1 = new JLabel("姓名");
+		JLabel label1 = new JLabel("学号:");
 		label1.setBounds(10, 10, 100, 30);
-		jFrame.add(label1);
+		this.add(label1);
 
-		JLabel label2 = new JLabel("密码");
+		JLabel label2 = new JLabel("密码:");
 		label2.setBounds(10, 40, 100, 30);
-		jFrame.add(label2);
+		this.add(label2);
 		
-		JLabel label3 = new JLabel("验证码");
+		JLabel label3 = new JLabel("验证码:");
 		label3.setBounds(250, 10, 100, 30);
-		jFrame.add(label3);
+		this.add(label3);
 		
-		JPanel panel = new ImagePanel();
-	    panel.setBounds(310,40,100,50);
-	    jFrame.add(panel);
+		JLabel label4 = new JLabel("by hoNoSayaka");
+		label4.setBounds(400, 140, 100, 30);
+		this.add(label4);
+		
+		JLabel label5 = new JLabel("点击访问http://honosayaka.github.io");
+		label5.setBounds(0, 140, 250, 30);
+		label5.addMouseListener(new MouseListener() {
+			public void mouseClicked(MouseEvent e) {
+				try {
+				 URI uri = new URI("http://honosayaka.github.io");  
+					Desktop.getDesktop().browse(uri);
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} 
+			}
+			public void mousePressed(MouseEvent e) {
+				
+			}
+			public void mouseReleased(MouseEvent e) {
+				
+			}
+			public void mouseEntered(MouseEvent e) {
+				
+			}
+			public void mouseExited(MouseEvent e) {
+			}
+		});
+		this.add(label5);
+		
+		JPanel panel = new ImagePanel(verifyImg,60,30);
+	    panel.setBounds(380,40,100,50);
+	    this.add(panel);
+	    
+	    JPanel panels = null;
+	    try {
+			panels = new ImagePanel(ImageIO.read(new File("imgs/photo.jpg")),130,130);
+		} catch (IOException e2) {
+			e2.printStackTrace();
+		}
+	    panels.setBounds(230,60,130,130);
+	    this.add(panels);
 	         
 		JTextField text1 = new JTextField();
 		text1.setBounds(50, 15, 130, 20);
-		jFrame.add(text1);
+		this.add(text1);
 
 		JTextField verify = new JTextField();
 		verify.setBounds(310, 15, 130, 20);
-		jFrame.add(verify);
+		this.add(verify);
 		
 		JPasswordField text2 = new JPasswordField();
 		text2.setBounds(50, 45, 130, 20);
-		jFrame.add(text2);
+		this.add(text2);
 
+		if(ifHasConfig()) {
+			hasConfig();
+			text1.setText(config[0]);
+			text2.setText(config[1]);
+		}
 		JButton button = new JButton("登陆");
 		button.setBounds(10, 75, 170, 40);
+		setVisible(true);
 		button.addActionListener(new ActionListener() {
 
 			public void actionPerformed(ActionEvent e) {
+				setVisible(false);
 				try {
-					Logger.doPost("http://wxkq.niit.edu.cn/home/login/chklogin",
+					String p = Logger.doPost("http://wxkq.niit.edu.cn/home/login/chklogin",
 							"username1="+text1.getText()+
 						"&password1="+String.valueOf(text2.getPassword())+
 						"&verify="+verify.getText());
-					setVisible(false);
 					start = new Proceed();
 					start.lunchFrame();
+					start.appear.append(p);
+					start.appear.append("Post 完成"+"\n"+"当前cookies:"+
+					Logger.getCookies()+"\n");
+					System.out.println(text1.getText());
+					System.out.println(String.valueOf(text2.getPassword()));
+					System.out.println(verify.getText());
 					Thread t = new Thread(start);
 					t.start();
-			//		Logger.doGet("http://wxkq.niit.edu.cn/Jz/index");
+				//	Logger.doGet("http://wxkq.niit.edu.cn/Jz/index");
 					
 				} catch (IOException e1) {
 					start.appear.append(e1.toString()+"\n");
 				}
 			}
 		});
-		jFrame.add(button);
-
-		jFrame.setVisible(true);
+		this.add(button);
 	}
 	 class ImagePanel extends JPanel {
-         public void paint(Graphics g) {
-             super.paint(g);
-             g.drawImage(verifyImg,0,0, null);
+		 Image img = null;
+		 int w;
+		 int h;
+		 public ImagePanel(Image img,int w,int h) {
+			 this.img = img;
+			 this.w = w;
+			 this.h = h;
+		 }
+        public void paint(Graphics g) {
+        	
+            super.paint(g);
+            g.drawImage(img,0,0, w,h,null);
+       /*      try {
+				g.drawImage(ImageIO.read(new File("imgs/photo.jpg")),100,50,null);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}*/
          }
      }
+	 
+	 public boolean ifHasConfig() {
+		 return new File("D:/Speech.config").exists();
+	 }
+	 
+	 public void hasConfig() {
+		 BufferedReader bf = null;
+		 try {
+			bf = new BufferedReader(
+					 new InputStreamReader(
+							 new FileInputStream(
+									 new File("D:/Speech.config"))));
+		config[0] = bf.readLine();
+		config[1] = bf.readLine();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	 }
+	 
+	 
+	 
+	 
 }
