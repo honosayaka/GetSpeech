@@ -12,16 +12,55 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 public class Logger {
 
-		public static String cookieVal = null;
+		private String cookieVal = null;
+		private String scode = null;
+		private String id;
 		
-		public static void init(String theCookie) {
-			cookieVal = theCookie;
+		public Logger(String cookies) {
+			this.cookieVal = cookies;
 		}
-		
-		public static String getCookies(){
+		public String getCookies(){
 			return cookieVal;
 		}
-		public static String doGet(String urlStr) throws IOException{
+		
+		public String doGet(String urlStr) throws IOException{
+			URL url = new URL(urlStr);
+			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			connection.setRequestMethod("GET");
+			connection.setRequestProperty("Cookie",cookieVal);
+			connection.connect();
+			//直到getInputStream()方法调用请求才真正发送出去
+			BufferedReader br = new BufferedReader(new InputStreamReader
+					(connection.getInputStream(),"utf-8"));
+		//	cookieVal = connection.getHeaderField("set-cookie");
+			StringBuilder sb = new StringBuilder();
+			String temp = null;
+			 while ((temp=br.readLine()) != null) {
+				 if(temp.trim().startsWith("window.location")) {
+					 String[] tempArry = temp.split("=");
+					 scode = tempArry[1].substring(27,59);//获取scode
+				 }
+				 if(temp.trim().startsWith("<a href=\"/home/Jz/show/id")) {//获取课程id
+					String[] tempArry = temp.split("=");
+					id = tempArry[1].substring(18,21);
+				 }
+				 if(temp.trim().startsWith("<td>剩余名额：")) {//获取课程id
+						String[] tempArry = temp.split("：");
+						int left = Integer.valueOf(tempArry[1].substring(0,1));
+						if(left != 0) {
+							return justGet("http://wxkq.niit.edu.cn/Jz/sign/id/"+id+"/s_code/"+scode);
+						}
+				 }
+				 
+		            sb.append(temp);
+		            sb.append("\n");
+		        }
+			br.close();
+			connection.disconnect();
+			return sb.toString()+"暂时没有检测到课程"+"\n"+"scode为"+scode;
+		}
+		
+		public String justGet(String urlStr) throws IOException{
 			URL url = new URL(urlStr);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("GET");
@@ -39,10 +78,10 @@ public class Logger {
 		        }
 			br.close();
 			connection.disconnect();
-			return sb.toString();
+			return sb.toString()+"\n"+"得到了一门"+"id为"+id+"\n";
 		}
 		
-		public static String doPost(String urlString,
+		public String doPost(String urlString,
 				String parm) throws IOException{
 			URL url = new URL(urlString);
 			HttpURLConnection connection = (HttpURLConnection) url.openConnection();
@@ -51,7 +90,8 @@ public class Logger {
 			connection.setDoInput(true); // 设置连接输入流为true
 			connection.setRequestMethod("POST"); // 设置请求方式为post
 			connection.setUseCaches(false); // post请求缓存设为false
-			connection.setInstanceFollowRedirects(true); //// 设置该HttpURLConnection实例是否自动执行重定向
+			connection.setInstanceFollowRedirects(true); 
+			//// 设置该HttpURLConnection实例是否自动执行重定向
 			// 设置请求头里面的各个属性 (以下为设置内容的类型,设置为经过urlEncoded编码过的from参数)
 	        // application/x-javascript text/xml->xml数据 application/x-javascript->json对象 application/x-www-form-urlencoded->表单数据
 			connection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");

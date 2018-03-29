@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
 
-import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -29,33 +28,38 @@ public class MainFrame extends JFrame {
 	Image verifyImg = null;
 	Proceed start = null;
 	String[] config = new String[2];
-	
-
-	public void lunchFrame(Image verifyImg) {
+	Image photo = null;
+	Logger log = null;
+	public MainFrame(Image verifyImg,Image photo,Logger log) {
 		this.verifyImg = verifyImg;
-		this.setTitle("登陆界面");
+		this.photo = photo;
+		this.log = log;
+	}
+
+	public void lunchFrame() {
+		setTitle("抢课登陆界面 --by hoNoSayaka");
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
-		this.setBounds(((int)dimension.getWidth() - 500) / 2,
+		setBounds(((int)dimension.getWidth() - 500) / 2,
 				((int)dimension.getHeight() - 200) / 2,500, 200);
-		this.setResizable(false);
-		this.setLayout(null);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setResizable(false);
+		setLayout(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		JLabel label1 = new JLabel("学号:");
 		label1.setBounds(10, 10, 100, 30);
-		this.add(label1);
+		add(label1);
 
 		JLabel label2 = new JLabel("密码:");
 		label2.setBounds(10, 40, 100, 30);
-		this.add(label2);
+		add(label2);
 		
 		JLabel label3 = new JLabel("验证码:");
 		label3.setBounds(250, 10, 100, 30);
-		this.add(label3);
+		add(label3);
 		
 		JLabel label4 = new JLabel("by hoNoSayaka");
 		label4.setBounds(400, 140, 100, 30);
-		this.add(label4);
+		add(label4);
 		
 		JLabel label5 = new JLabel("点击访问http://honosayaka.github.io");
 		label5.setBounds(0, 140, 250, 30);
@@ -65,48 +69,35 @@ public class MainFrame extends JFrame {
 				 URI uri = new URI("http://honosayaka.github.io");  
 					Desktop.getDesktop().browse(uri);
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} 
 			}
-			public void mousePressed(MouseEvent e) {
-				
-			}
-			public void mouseReleased(MouseEvent e) {
-				
-			}
-			public void mouseEntered(MouseEvent e) {
-				
-			}
-			public void mouseExited(MouseEvent e) {
-			}
+			public void mousePressed(MouseEvent e) {}
+			public void mouseReleased(MouseEvent e) {}
+			public void mouseEntered(MouseEvent e) {}
+			public void mouseExited(MouseEvent e) {}
 		});
-		this.add(label5);
+		add(label5);
 		
 		JPanel panel = new ImagePanel(verifyImg,60,30);
 	    panel.setBounds(380,40,100,50);
-	    this.add(panel);
-	    
+	    add(panel);
 	    JPanel panels = null;
-	    try {
-			panels = new ImagePanel(ImageIO.read(new File("imgs/photo.jpg")),130,130);
-		} catch (IOException e2) {
-			e2.printStackTrace();
-		}
+	    panels = new ImagePanel(photo,130,130);
 	    panels.setBounds(230,60,130,130);
-	    this.add(panels);
+	    add(panels);
 	         
 		JTextField text1 = new JTextField();
 		text1.setBounds(50, 15, 130, 20);
-		this.add(text1);
+		add(text1);
 
 		JTextField verify = new JTextField();
 		verify.setBounds(310, 15, 130, 20);
-		this.add(verify);
+		add(verify);
 		
 		JPasswordField text2 = new JPasswordField();
 		text2.setBounds(50, 45, 130, 20);
-		this.add(text2);
+		add(text2);
 
 		if(ifHasConfig()) {
 			hasConfig();
@@ -121,28 +112,27 @@ public class MainFrame extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 				try {
-					String p = Logger.doPost("http://wxkq.niit.edu.cn/home/login/chklogin",
+					String p = log.doPost("http://wxkq.niit.edu.cn/home/login/chklogin",
 							"username1="+text1.getText()+
 						"&password1="+String.valueOf(text2.getPassword())+
 						"&verify="+verify.getText());
 					start = new Proceed();
-					start.lunchFrame();
+					start.lunchFrame(log);
 					start.appear.append(p);
-					start.appear.append("Post 完成"+"\n"+"当前cookies:"+
-					Logger.getCookies()+"\n");
-					System.out.println(text1.getText());
-					System.out.println(String.valueOf(text2.getPassword()));
-					System.out.println(verify.getText());
+					start.appear.setCaretPosition(start.appear.getDocument().getLength());
+					start.sysAppend("Post 完成"+"\n"+"当前cookies:"+
+					log.getCookies()+"\n");
+					start.appear.setCaretPosition(start.appear.getDocument().getLength());
 					Thread t = new Thread(start);
 					t.start();
 				//	Logger.doGet("http://wxkq.niit.edu.cn/Jz/index");
 					
 				} catch (IOException e1) {
-					start.appear.append(e1.toString()+"\n");
+					start.sysAppend(e1.toString()+"\n");
 				}
 			}
 		});
-		this.add(button);
+		add(button);
 	}
 	 class ImagePanel extends JPanel {
 		 Image img = null;
@@ -182,8 +172,5 @@ public class MainFrame extends JFrame {
 			e.printStackTrace();
 		}
 	 }
-	 
-	 
-	 
-	 
+	  
 }

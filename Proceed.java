@@ -10,14 +10,17 @@ import javax.swing.JTextArea;
 @SuppressWarnings("serial")
 public class Proceed extends JFrame implements Runnable{
 	JTextArea appear = null;
-
-	public void lunchFrame() {
+	Logger log = null;
+	
+	public void lunchFrame(Logger log) {
+		this.log = log;
 		Dimension dimension = Toolkit.getDefaultToolkit().getScreenSize();
 		setBounds(((int)dimension.getWidth() - 500) / 2,
 				((int)dimension.getHeight() - 200) / 2,500, 200);
-		this.setResizable(false);
-		this.setLayout(null);
-		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setTitle("抢课 --by hoNoSayaka");
+		setResizable(false);
+		setLayout(null);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		appear = new JTextArea();
 		appear.setLineWrap(true);// 激活自动换行功能    
 		appear.setWrapStyleWord(true);// 激活断行不断字功能   
@@ -29,24 +32,39 @@ public class Proceed extends JFrame implements Runnable{
 		panel.setBounds(0, 0, 500,180);
 		panel.setLayout(null);
 		panel.add(js);
-		this.add(panel);
-		this.setVisible(true);
-		appear.append("尝试开始,请确保正确登陆!"+"\n"+"尝试开始,请确保正确登陆!"+"\n"+"尝试开始,请确保正确登陆!"+"\n");
+		add(panel);
+		setVisible(true);
+		sysAppend("尝试开始,请确保正确登陆!"+"\n"+"尝试开始,请确保正确登陆!"+"\n"+"尝试开始,请确保正确登陆!"+"\n");
+		appear.setCaretPosition(appear.getDocument().getLength());
 	}
-	
+		public void sysAppend(String appString) {
+			appear.append(appString);
+		}
 	int times = 1;
 	
 	public void run(){
-		appear.append("start run"+"\n");
+		try {
+			appear.append("start run"+"\n");
+			appear.append("3秒后开始!"+"\n");
+			appear.append("3"+"\n");
+			Thread.sleep(1000);
+			appear.append("2"+"\n");
+			Thread.sleep(1000);
+			appear.append("1"+"\n");
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 		while(true) {
 			try {
-				appear.append("这是第"+times+"次尝试获取讲座"+"\n");
-				appear.append(Logger.doGet("http://wxkq.niit.edu.cn/jz/index")+"\n");
-				appear.append("Get 完成"+"\n"+"当前cookies:"+Logger.getCookies()+"\n");
+				appear.append(log.doGet("http://wxkq.niit.edu.cn/jz/index")+"\n");
+				sysAppend("这是第"+times+"次尝试获取讲座"+"\n");
+				sysAppend("Get 完成"+"\n"+"当前cookies:"+log.getCookies()+"\n");
+				appear.setCaretPosition(appear.getDocument().getLength());
 				Thread.sleep(60000);
 				times++;
 			} catch (Exception e) {
-				appear.append(e.toString()+"\n");
+				sysAppend(e.toString()+"\n");
 			}
 		}
 	}

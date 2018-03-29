@@ -1,12 +1,15 @@
 package cn.hoNoSayaka.jt;
 
+
+
 public class Index {
 	
-	public static void main(String[] args) {
-		GetImgCookice g = new GetImgCookice("http://wxkq.niit.edu.cn/Login/verify");
-		Logger.init(g.getCookie());
-		MainFrame f = new MainFrame();
-		f.lunchFrame(g.getImage());
+	public static void main(String[] args) throws Exception {
+		GetUtil gater = new GetUtil();
+		gater.GetImgCookice("http://wxkq.niit.edu.cn/Login/verify");
+		Logger log = new Logger(gater.getCookie());
+		MainFrame f = new MainFrame(gater.getImage(),gater.getImage("imgs/photo.jpg"),log);
+		f.lunchFrame();
 	}
 
 }
