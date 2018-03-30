@@ -15,6 +15,8 @@ public class Logger {
 		private String cookieVal = null;
 		private String scode = null;
 		private String id;
+		private int gettedTimes;
+		boolean isLogged = false;
 		
 		public Logger(String cookies) {
 			this.cookieVal = cookies;
@@ -36,6 +38,9 @@ public class Logger {
 			StringBuilder sb = new StringBuilder();
 			String temp = null;
 			 while ((temp=br.readLine()) != null) {
+				 if(!isLogged) {
+					 return "请查看上方数据,是否确保正确登陆!";
+				 }
 				 if(temp.trim().startsWith("window.location")) {
 					 String[] tempArry = temp.split("=");
 					 scode = tempArry[1].substring(27,59);//获取scode
@@ -57,7 +62,8 @@ public class Logger {
 		        }
 			br.close();
 			connection.disconnect();
-			return sb.toString()+"暂时没有检测到课程"+"\n"+"scode为"+scode;
+			return sb.toString()+"暂时没有检测到课程"+"\n"+"scode为"+scode+
+					"\n"+"当前共获得了"+gettedTimes;
 		}
 		
 		public String justGet(String urlStr) throws IOException{
@@ -78,7 +84,8 @@ public class Logger {
 		        }
 			br.close();
 			connection.disconnect();
-			return sb.toString()+"\n"+"得到了一门"+"id为"+id+"\n";
+			gettedTimes++;
+			return sb.toString()+"\n"+"得到了一门"+"id为"+id+"\n"+"当前共获得了"+gettedTimes;
 		}
 		
 		public String doPost(String urlString,
@@ -112,13 +119,17 @@ public class Logger {
 	        String temp = null;
 	        StringBuilder sb = new StringBuilder(); // 用来存储响应数据           
 	        while ((temp=bf.readLine()) != null) {
+	        	if(temp.trim().startsWith("<title>登录成功！")) {
+	        		isLogged = true;
+	        		return "已经检测到登陆成功标识!"+"\n";
+	        	}
 	            sb.append(temp);
 	            sb.append("\n");
 	        }
 	        bf.close();
 	         // 销毁连接
 	        connection.disconnect();
-	        return sb.toString();   // 重要且易忽略步骤 (关闭流,切记!)*/
+	        return sb.toString()+"可能登陆失败!"+"\n";   // 重要且易忽略步骤 (关闭流,切记!)*/
 	 //       System.out.println(cookieVal);
 		}
 	}

@@ -87,15 +87,15 @@ public class MainFrame extends JFrame {
 	    panels.setBounds(230,60,130,130);
 	    add(panels);
 	         
-		JTextField text1 = new JTextField();
+		final JTextField text1 = new JTextField();
 		text1.setBounds(50, 15, 130, 20);
 		add(text1);
 
-		JTextField verify = new JTextField();
+		final JTextField verify = new JTextField();
 		verify.setBounds(310, 15, 130, 20);
 		add(verify);
 		
-		JPasswordField text2 = new JPasswordField();
+		final JPasswordField text2 = new JPasswordField();
 		text2.setBounds(50, 45, 130, 20);
 		add(text2);
 
@@ -109,6 +109,7 @@ public class MainFrame extends JFrame {
 		setVisible(true);
 		button.addActionListener(new ActionListener() {
 
+			@SuppressWarnings("static-access")
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
 				try {
@@ -120,12 +121,13 @@ public class MainFrame extends JFrame {
 					start.lunchFrame(log);
 					start.appear.append(p);
 					start.appear.setCaretPosition(start.appear.getDocument().getLength());
+					start.appear.append("您有3秒检查是否正确登陆!"+"\n");
+					start.appear.setCaretPosition(start.appear.getDocument().getLength());
 					start.sysAppend("Post 完成"+"\n"+"当前cookies:"+
 					log.getCookies()+"\n");
 					start.appear.setCaretPosition(start.appear.getDocument().getLength());
 					Thread t = new Thread(start);
 					t.start();
-				//	Logger.doGet("http://wxkq.niit.edu.cn/Jz/index");
 					
 				} catch (IOException e1) {
 					start.sysAppend(e1.toString()+"\n");

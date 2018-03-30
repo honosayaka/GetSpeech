@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+
 @SuppressWarnings("serial")
 public class Proceed extends JFrame implements Runnable{
 	JTextArea appear = null;
@@ -24,6 +25,7 @@ public class Proceed extends JFrame implements Runnable{
 		appear = new JTextArea();
 		appear.setLineWrap(true);// 激活自动换行功能    
 		appear.setWrapStyleWord(true);// 激活断行不断字功能   
+		appear.setEditable(false);//禁止改动内容
 		JPanel panel = new JPanel();
 		JScrollPane js = new JScrollPane(appear);
 		js.setBounds(0, 0, 490,180);
@@ -46,11 +48,15 @@ public class Proceed extends JFrame implements Runnable{
 		try {
 			appear.append("start run"+"\n");
 			appear.append("3秒后开始!"+"\n");
+			appear.setCaretPosition(appear.getDocument().getLength());
 			appear.append("3"+"\n");
+			appear.setCaretPosition(appear.getDocument().getLength());
 			Thread.sleep(1000);
 			appear.append("2"+"\n");
+			appear.setCaretPosition(appear.getDocument().getLength());
 			Thread.sleep(1000);
 			appear.append("1"+"\n");
+			appear.setCaretPosition(appear.getDocument().getLength());
 			Thread.sleep(1000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
