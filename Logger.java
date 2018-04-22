@@ -15,7 +15,7 @@ public class Logger {
 		private String cookieVal = null;
 		private String scode = null;
 		private String id;
-		private int gettedTimes;
+		private static int gettedTimes;
 		boolean isLogged = false;
 		
 		public Logger(String cookies) {
@@ -23,6 +23,9 @@ public class Logger {
 		}
 		public String getCookies(){
 			return cookieVal;
+		}
+		public static boolean isFull() {
+			return gettedTimes == 5;
 		}
 		
 		public String doGet(String urlStr) throws IOException{

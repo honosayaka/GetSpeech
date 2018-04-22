@@ -8,7 +8,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 
-@SuppressWarnings("serial")
+@SuppressWarnings("all")
 public class Proceed extends JFrame implements Runnable{
 	JTextArea appear = null;
 	Logger log = null;
@@ -62,6 +62,9 @@ public class Proceed extends JFrame implements Runnable{
 			e1.printStackTrace();
 		}
 		while(true) {
+			if(Logger.isFull()) {
+				break;
+			}
 			try {
 				appear.append(log.doGet("http://wxkq.niit.edu.cn/jz/index")+"\n");
 				sysAppend("这是第"+times+"次尝试获取讲座"+"\n");
@@ -73,6 +76,7 @@ public class Proceed extends JFrame implements Runnable{
 				sysAppend(e.toString()+"\n");
 			}
 		}
+		appear.append("得到课程已达最大数!");
 	}
 	
 }
